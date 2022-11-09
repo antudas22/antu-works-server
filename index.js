@@ -19,6 +19,7 @@ async function run(){
     try{
         const serviceCollection = client.db('antuWorks').collection('services');
         const reviewCollection = client.db('antuWorks').collection('reviews');
+
         app.get('/services', async(req, res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
@@ -41,16 +42,22 @@ async function run(){
 
         app.get('/reviews', async(req, res) => {
             const query = {}
-            const cursor = orderCollection.find(query);
+            const cursor = reviewCollection.find(query);
             const reviews = await cursor.toArray();
-            res.send(reviews);
+            res.send(reviews.reverse());
         })
 
         app.post('/reviews', async(req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
             res.send(result);
+        })
 
+        app.delete('/reviews/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result);
         })
     }
     finally{
